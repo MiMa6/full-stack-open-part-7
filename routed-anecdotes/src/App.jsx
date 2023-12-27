@@ -100,9 +100,14 @@ const CreateNew = (props) => {
       votes: 0
     })
     navigate('/')
-    
+
   }
 
+  const clearField = () => {
+    content.reset()
+    author.reset()
+    info.reset()
+  }
 
   return (
     <div>
@@ -110,18 +115,31 @@ const CreateNew = (props) => {
       <form onSubmit={handleSubmit}>
         <div>
           content
-          <input {...content} />
+          <input
+            value={content.value}
+            type={content.type}
+            onChange={content.onChange}
+          />
         </div>
         <div>
           author
-          <input {...author} />
+          <input
+            value={author.value}
+            type={author.type}
+            onChange={author.onChange}
+          />
         </div>
         <div>
           url for more info
-          <input {...info}/>
+          <input
+            value={info.value}
+            type={info.type}
+            onChange={info.onChange}
+          />
         </div>
         <button>create</button>
       </form>
+      <button onClick={clearField}>reset</button>
     </div>
   )
 
@@ -147,8 +165,8 @@ const App = () => {
   const [info, setInfo] = useState({ message: null })
 
   const notifyWith = (message) => {
-    setInfo({message})
-  
+    setInfo({ message })
+
     setTimeout(() => {
       setInfo({ message: null })
     }, 5000)

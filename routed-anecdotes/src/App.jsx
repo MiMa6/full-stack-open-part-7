@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useField } from './hooks'
 
 import {
   Routes,
@@ -81,21 +82,36 @@ const Footer = () => (
 )
 
 const CreateNew = (props) => {
-  const [content, setContent] = useState('')
-  const [author, setAuthor] = useState('')
-  const [info, setInfo] = useState('')
+  const content = useField('content')
+  const author = useField('author')
+  const info = useField('info')
+  const { reset: resetContent, ...contentInput } = content;
+  const { reset: resetAuthor, ...authorInput } = author;
+  const { reset: resetInfo, ...infoInput } = info;
+
+
   const navigate = useNavigate()
 
 
   const handleSubmit = (e) => {
     e.preventDefault()
+    console.log(content)
+    console.log(author)
+    console.log(info)
     props.addNew({
-      content,
-      author,
-      info,
+      content: content.value,
+      author: author.value,
+      info: info.value,
       votes: 0
     })
     navigate('/')
+
+  }
+
+  const clearField = () => {
+    content.reset()
+    author.reset()
+    info.reset()
   }
 
   return (
@@ -104,18 +120,19 @@ const CreateNew = (props) => {
       <form onSubmit={handleSubmit}>
         <div>
           content
-          <input name='content' value={content} onChange={(e) => setContent(e.target.value)} />
+          <input {...contentInput}/>
         </div>
         <div>
           author
-          <input name='author' value={author} onChange={(e) => setAuthor(e.target.value)} />
+          <input {...authorInput}/>
         </div>
         <div>
           url for more info
-          <input name='info' value={info} onChange={(e) => setInfo(e.target.value)} />
+          <input {...infoInput}/>
         </div>
         <button>create</button>
       </form>
+      <button onClick={clearField}>reset</button>
     </div>
   )
 
@@ -138,12 +155,11 @@ const App = () => {
       id: 2
     }
   ])
-  const [notification, setNotification] = useState('')
   const [info, setInfo] = useState({ message: null })
 
   const notifyWith = (message) => {
-    setInfo({message})
-  
+    setInfo({ message })
+
     setTimeout(() => {
       setInfo({ message: null })
     }, 5000)

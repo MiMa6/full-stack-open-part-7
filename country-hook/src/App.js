@@ -20,18 +20,18 @@ const useCountry = (name) => {
   const baseUrl = 'https://studies.cs.helsinki.fi/restcountries'
 
   useEffect(() => {
-     const request = axios.get(`${baseUrl}/api/name/${name}`)
-     request
-     .then(countryData  => {
-      const newcountryData = {...countryData, found: true}
-      setCountry(newcountryData)
-      console.log(country)
-     })
-     .catch(error => {
-      setCountry({found: false})
-      console.log(error)
-     })
-   }, [name])
+    const request = axios.get(`${baseUrl}/api/name/${name}`)
+    request
+      .then(countryData => {
+        const newcountryData = { ...countryData, found: true }
+        setCountry(newcountryData)
+        console.log(country)
+      })
+      .catch(error => {
+        setCountry({ found: false })
+        console.log(error)
+      })
+  }, [name])
 
   return country
 }
@@ -53,8 +53,8 @@ const Country = ({ country }) => {
     <div>
       <h3>{country.data.name.common} </h3>
       <div>capital {country.data.capital} </div>
-      <div>population {country.data.population}</div> 
-      <img src={country.data.flags.png} height='100' alt={`flag of ${country.data.name.common}`}/>  
+      <div>population {country.data.population}</div>
+      <img src={country.data.flags.png} height='100' alt={`flag of ${country.data.name.common}`} />
     </div>
   )
 }

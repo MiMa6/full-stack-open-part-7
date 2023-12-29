@@ -14,14 +14,15 @@ import {
   deleteBlogById,
 } from "./reducers/blogReducer";
 
+import { setUser, clearUser } from "./reducers/userReducer";
 import { setNotification } from "./reducers/notificationReducer";
 import { useSelector, useDispatch } from "react-redux";
 
 const App = () => {
   const dispatch = useDispatch();
   const blogs = useSelector((state) => state.blogs);
+  const user = useSelector((state) => state.user);
 
-  const [user, setUser] = useState(null);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
@@ -34,7 +35,7 @@ const App = () => {
     const loggedUserJSON = window.localStorage.getItem("loggedBlogAppUser");
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON);
-      setUser(user);
+      dispatch(setUser(user));
       blogService.setToken(user.token);
     }
   }, []);
@@ -50,7 +51,7 @@ const App = () => {
       window.localStorage.setItem("loggedBlogAppUser", JSON.stringify(user));
 
       blogService.setToken(user.token);
-      setUser(user);
+      dispatch(setUser(user));
       setUsername("");
       setPassword("");
     } catch (exception) {
@@ -61,7 +62,7 @@ const App = () => {
   const handleLogout = () => {
     if (window.confirm("Are you sure you want to log out")) {
       window.localStorage.removeItem("loggedBlogAppUser");
-      setUser(null);
+      dispatch(clearUser(user));
     }
   };
 

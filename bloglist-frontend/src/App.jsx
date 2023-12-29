@@ -7,19 +7,21 @@ import Notification from "./components/Notification";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
 
+import { initializeBlogs, createNewBlog } from "./reducers/blogReducer";
+import { setNotification } from "./reducers/notificationReducer";
+import { useSelector, useDispatch } from "react-redux";
+
 const App = () => {
-  const [blogs, setBlogs] = useState([]);
+  const dispatch = useDispatch();
+  const blogs = useSelector((state) => state.blogs);
+
   const [user, setUser] = useState(null);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [info, setInfo] = useState({ message: null });
 
   useEffect(() => {
-    const fetchBlogs = async () => {
-      const blogs = await blogService.getAll();
-      setBlogs(blogs);
-    };
-    fetchBlogs();
+    console.log("blogs fetched");
+    dispatch(initializeBlogs());
   }, [blogs.length]);
 
   useEffect(() => {
@@ -30,17 +32,6 @@ const App = () => {
       blogService.setToken(user.token);
     }
   }, []);
-
-  const notifyWith = (message, type = "info") => {
-    setInfo({
-      message,
-      type,
-    });
-
-    setTimeout(() => {
-      setInfo({ message: null });
-    }, 3500);
-  };
 
   const handleLogin = async (event) => {
     event.preventDefault();
@@ -57,7 +48,7 @@ const App = () => {
       setUsername("");
       setPassword("");
     } catch (exception) {
-      notifyWith("wrong username or password", "error");
+      dispatch(setNotification("wrong username or password", "error", 5));
     }
   };
 
@@ -70,21 +61,22 @@ const App = () => {
 
   const createBlog = async (blogObject) => {
     try {
-      const createdBlog = await blogService.create(blogObject);
-
-      setBlogs(blogs.concat(createdBlog));
-      notifyWith(
-        `a new blog ${createdBlog.title} by ${createdBlog.author} added`,
-        "info",
+      dispatch(createNewBlog(blogObject));
+      dispatch(
+        setNotification(
+          `a new blog ${blogObject.title} by ${blogObject.author} added`,
+          "info",
+          5,
+        ),
       );
       blogFormRef.current.toggleVisibility();
     } catch (exception) {
       console.log(exception);
       const responseErrorMessage = exception.response.data.error;
       if (responseErrorMessage.includes("Blog validation failed")) {
-        notifyWith("title and url required", "error");
+        dispatch(setNotification("title and url required", "error", 5));
       } else {
-        notifyWith(responseErrorMessage, "error");
+        dispatch(setNotification(responseErrorMessage, "error", 5));
       }
     }
   };
@@ -101,7 +93,7 @@ const App = () => {
       );
     } catch (exception) {
       console.log(exception);
-      notifyWith("Updating likes failed", "error");
+      dispatch(setNotification("Updating likes failed", "error", 5));
     }
   };
 
@@ -112,13 +104,21 @@ const App = () => {
       try {
         await blogService.del(id);
         setBlogs(blogs.filter((blog) => blog.id !== id));
-        notifyWith(`Blog ${blog.title} by ${blog.author} deleted`, "info");
+        dispatch(
+          setNotification(
+            `Blog ${blog.title} by ${blog.author} deleted`,
+            "info",
+            5,
+          ),
+        );
       } catch (exception) {
         console.log(exception);
         if (exception.response.status === 401) {
-          notifyWith("Only blog creator can delete blog", "error");
+          dispatch(
+            setNotification("Only blog creator can delete blog", "error", 5),
+          );
         } else {
-          notifyWith("Removing blog failed", "error");
+          dispatch(setNotification("Removing blog failed", "error", 5));
         }
       }
     }
@@ -143,7 +143,7 @@ const App = () => {
       <div>
         <h2>Log in to application</h2>
 
-        <Notification info={info} />
+        <Notification />
 
         <LoginForm
           handleLogin={handleLogin}
@@ -156,13 +156,13 @@ const App = () => {
     );
   }
 
-  const blogsSortedDesc = blogs.sort((a, b) => b.likes - a.likes);
+  const blogsSortedDesc =
+    blogs.lenght > 0 ? blogs.sort((a, b) => b.likes - a.likes) : blogs;
 
   return (
     <div>
       <h2>blogs</h2>
-
-      <Notification info={info} />
+      <Notification />
 
       <div>
         {user.name} logged in

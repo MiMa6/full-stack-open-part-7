@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import blogService from "../services/blogs";
+import { setNotification } from "../reducers/notificationReducer";
 
 const blogSlice = createSlice({
   name: "blogs",
@@ -8,7 +9,7 @@ const blogSlice = createSlice({
     updateBlog(state, action) {
       const changedBlog = action.payload;
       return state.map((blog) =>
-        blog.id !== changedBlog.id ? blog : changedBlog
+        blog.id !== changedBlog.id ? blog : changedBlog,
       );
     },
     sortBlogs(state) {
@@ -41,31 +42,72 @@ export const initializeBlogs = () => {
 
 export const createNewBlog = (content) => {
   return async (dispatch) => {
-    const newBlog = await blogService.create(content);
-    dispatch(appendBlog(newBlog));
+    try {
+      const newBlog = await blogService.create(content);
+      console.log(newBlog);
+      dispatch(appendBlog(newBlog));
+      dispatch(
+        setNotification(
+          `a new blog ${newBlog.title} by ${newBlog.author} added`,
+          "info",
+          5,
+        ),
+      );
+    } catch (exception) {
+      console.log("exception");
+      const responseErrorMessage = exception.response.data.error;
+      if (responseErrorMessage.includes("Blog validation failed")) {
+        dispatch(setNotification("title and url required", "error", 5));
+      } else {
+        dispatch(setNotification(responseErrorMessage, "error", 5));
+      }
+    }
   };
 };
 
 export const increaseBlogLikes = (id, userId, blogToChange) => {
   return async (dispatch) => {
-    const changedBlog = {
-      ...blogToChange,
-      likes: blogToChange.likes + 1,
-      user: userId,
-    };
-    const updatedBlog = await blogService.update(id, changedBlog);
-    const updatedBlogWithUser = {
-      ...updatedBlog,
-      user: blogToChange.user,
-    };
-    dispatch(updateBlog(updatedBlogWithUser));
+    try {
+      const changedBlog = {
+        ...blogToChange,
+        likes: blogToChange.likes + 1,
+        user: userId,
+      };
+      const updatedBlog = await blogService.update(id, changedBlog);
+      const updatedBlogWithUser = {
+        ...updatedBlog,
+        user: blogToChange.user,
+      };
+      dispatch(updateBlog(updatedBlogWithUser));
+    } catch (exception) {
+      console.log(exception);
+      dispatch(setNotification("Updating likes failed", "error", 5));
+    }
   };
 };
 
-export const deleteBlogById = (id) => {
+export const deleteBlogById = (id, blog) => {
   return async (dispatch) => {
-    await blogService.del(id);
-    dispatch(deleteBlog(id));
+    try {
+      await blogService.del(id);
+      dispatch(deleteBlog(id));
+      dispatch(
+        setNotification(
+          `Blog ${blog.title} by ${blog.author} deleted`,
+          "info",
+          5,
+        ),
+      );
+    } catch (exception) {
+      console.log(exception);
+      if (exception.response.status === 401) {
+        dispatch(
+          setNotification("Only blog creator can delete blog", "error", 5),
+        );
+      } else {
+        dispatch(setNotification("Removing blog failed", "error", 5));
+      }
+    }
   };
 };
 

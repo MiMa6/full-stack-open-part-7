@@ -66,60 +66,20 @@ const App = () => {
   };
 
   const createBlog = async (blogObject) => {
-    try {
-      dispatch(createNewBlog(blogObject));
-      dispatch(
-        setNotification(
-          `a new blog ${blogObject.title} by ${blogObject.author} added`,
-          "info",
-          5,
-        ),
-      );
-      blogFormRef.current.toggleVisibility();
-    } catch (exception) {
-      console.log(exception);
-      const responseErrorMessage = exception.response.data.error;
-      if (responseErrorMessage.includes("Blog validation failed")) {
-        dispatch(setNotification("title and url required", "error", 5));
-      } else {
-        dispatch(setNotification(responseErrorMessage, "error", 5));
-      }
-    }
+    dispatch(createNewBlog(blogObject));
+    blogFormRef.current.toggleVisibility();
   };
 
   const increaseLikes = async (id) => {
     const blogToChange = blogs.find((blog) => blog.id === id);
-    try {
-      dispatch(increaseBlogLikes(id, user.id, blogToChange));
-    } catch (exception) {
-      console.log(exception);
-      dispatch(setNotification("Updating likes failed", "error", 5));
-    }
+    dispatch(increaseBlogLikes(id, user.id, blogToChange));
   };
 
   const deleteBlog = async (id) => {
     const blog = blogs.find((blog) => blog.id === id);
 
     if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
-      try {
-        dispatch(deleteBlogById(id));
-        dispatch(
-          setNotification(
-            `Blog ${blog.title} by ${blog.author} deleted`,
-            "info",
-            5,
-          ),
-        );
-      } catch (exception) {
-        console.log(exception);
-        if (exception.response.status === 401) {
-          dispatch(
-            setNotification("Only blog creator can delete blog", "error", 5),
-          );
-        } else {
-          dispatch(setNotification("Removing blog failed", "error", 5));
-        }
-      }
+      dispatch(deleteBlogById(id, blog));
     }
   };
 

@@ -7,7 +7,13 @@ import Notification from "./components/Notification";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
 
-import { initializeBlogs, createNewBlog } from "./reducers/blogReducer";
+import {
+  initializeBlogs,
+  createNewBlog,
+  increaseBlogLikes,
+  deleteBlogById,
+} from "./reducers/blogReducer";
+
 import { setNotification } from "./reducers/notificationReducer";
 import { useSelector, useDispatch } from "react-redux";
 
@@ -20,9 +26,9 @@ const App = () => {
   const [password, setPassword] = useState("");
 
   useEffect(() => {
-    console.log("blogs fetched");
     dispatch(initializeBlogs());
-  }, [blogs.length]);
+    console.log("blogs fetched");
+  }, [dispatch]);
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem("loggedBlogAppUser");
@@ -82,15 +88,9 @@ const App = () => {
   };
 
   const increaseLikes = async (id) => {
-    const blog = blogs.find((blog) => blog.id === id);
-    const changedBlog = { ...blog, likes: blog.likes + 1, user: user.id };
-
+    const blogToChange = blogs.find((blog) => blog.id === id);
     try {
-      const updatedBlog = await blogService.update(id, changedBlog);
-      const updatedBlogWithUserInfo = { ...updatedBlog, user: blog.user };
-      setBlogs(
-        blogs.map((blog) => (blog.id !== id ? blog : updatedBlogWithUserInfo)),
-      );
+      dispatch(increaseBlogLikes(id, user.id, blogToChange));
     } catch (exception) {
       console.log(exception);
       dispatch(setNotification("Updating likes failed", "error", 5));
@@ -102,8 +102,7 @@ const App = () => {
 
     if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
       try {
-        await blogService.del(id);
-        setBlogs(blogs.filter((blog) => blog.id !== id));
+        dispatch(deleteBlogById(id));
         dispatch(
           setNotification(
             `Blog ${blog.title} by ${blog.author} deleted`,
@@ -156,9 +155,6 @@ const App = () => {
     );
   }
 
-  const blogsSortedDesc =
-    blogs.lenght > 0 ? blogs.sort((a, b) => b.likes - a.likes) : blogs;
-
   return (
     <div>
       <h2>blogs</h2>
@@ -176,7 +172,7 @@ const App = () => {
         {blogForm()}
       </div>
       <div>
-        {blogsSortedDesc.map((blog) => (
+        {blogs.map((blog) => (
           <Blog
             key={blog.id}
             blog={blog}

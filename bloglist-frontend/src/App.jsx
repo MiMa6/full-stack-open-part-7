@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import BlogsView from "./components/BlogsView";
 import UsersView from "./components/UsersView";
+import UserView from "./components/UserView";
 import BlogForm from "./components/BlogForm";
 import LoginForm from "./components/LoginForm";
 import Togglable from "./components/Togglable";
@@ -15,7 +16,7 @@ import {
   deleteBlogById,
 } from "./reducers/blogReducer";
 
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useMatch } from "react-router-dom";
 
 import { setUser, clearUser } from "./reducers/userReducer";
 import { setNotification } from "./reducers/notificationReducer";
@@ -23,6 +24,8 @@ import { useSelector, useDispatch } from "react-redux";
 
 const App = () => {
   const dispatch = useDispatch();
+  const userMatch = useMatch("/users/:id");
+
   const blogs = useSelector((state) => state.blogs);
   const user = useSelector((state) => state.user);
 
@@ -119,6 +122,13 @@ const App = () => {
     );
   }
 
+  const blogsByUserId = (userId) =>
+    blogs.filter((blog) => blog.user.id === userId);
+
+  const blogsByUserMatch = userMatch
+    ? blogsByUserId(userMatch.params.id)
+    : null;
+
   return (
     <div>
       <h2>blogs</h2>
@@ -144,6 +154,10 @@ const App = () => {
           }
         />
         <Route path="/users" element={<UsersView blogs={blogs} />} />
+        <Route
+          path="/users/:id"
+          element={<UserView blogs={blogsByUserMatch} />}
+        />
       </Routes>
     </div>
   );

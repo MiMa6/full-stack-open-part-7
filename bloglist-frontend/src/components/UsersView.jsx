@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import _ from "lodash";
 
 const UsersView = ({ blogs }) => {
@@ -5,7 +6,9 @@ const UsersView = ({ blogs }) => {
     return null;
   }
 
-  const groupBlogsByAuthor = _.groupBy(blogs, "user.name");
+  const groupBlogsByAuthor = _.groupBy(blogs, "user.id");
+  const userName = blogs[0].user.name;
+
   return (
     <div>
       <h2>Users</h2>
@@ -15,10 +18,12 @@ const UsersView = ({ blogs }) => {
             <th>Name</th>
             <th>Blogs</th>
           </tr>
-          {Object.entries(groupBlogsByAuthor).map(([user, blogs]) => {
+          {Object.entries(groupBlogsByAuthor).map(([userId, blogs]) => {
             return (
-              <tr key={user}>
-                <td>{user}</td>
+              <tr key={userId}>
+                <td>
+                  <Link to={`/users/${userId}`}>{userName}</Link>
+                </td>
                 <td>{blogs.length}</td>
               </tr>
             );

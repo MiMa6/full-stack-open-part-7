@@ -137,7 +137,7 @@ const App = () => {
   const blogByMatch = blogMatch ? blogById(blogMatch.params.id) : null;
 
   return (
-    <div>
+    <div className="container">
       <h2>blogs</h2>
       <Notification />
       <Navigation userName={user.name} handleLogout={handleLogout} />

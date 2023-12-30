@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import Table from 'react-bootstrap/Table';
 import _ from "lodash";
 
 const UsersView = ({ blogs }) => {
@@ -12,7 +13,7 @@ const UsersView = ({ blogs }) => {
   return (
     <div>
       <h2>Users</h2>
-      <table>
+      <Table striped>
         <tbody>
           <tr>
             <th>Name</th>
@@ -29,7 +30,7 @@ const UsersView = ({ blogs }) => {
             );
           })}
         </tbody>
-      </table>
+      </Table>
     </div>
   );
 };

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-import Blog from "./components/Blog";
+import BlogsView from "./components/BlogsView";
+import UsersView from "./components/UsersView";
 import BlogForm from "./components/BlogForm";
 import LoginForm from "./components/LoginForm";
 import Togglable from "./components/Togglable";
@@ -13,6 +14,8 @@ import {
   increaseBlogLikes,
   deleteBlogById,
 } from "./reducers/blogReducer";
+
+import { Routes, Route } from "react-router-dom";
 
 import { setUser, clearUser } from "./reducers/userReducer";
 import { setNotification } from "./reducers/notificationReducer";
@@ -127,22 +130,21 @@ const App = () => {
       </div>
 
       <br />
-
-      <div>
-        <h2> create new </h2>
-        {blogForm()}
-      </div>
-      <div>
-        {blogs.map((blog) => (
-          <Blog
-            key={blog.id}
-            blog={blog}
-            increaseLikes={increaseLikes}
-            deleteBlog={deleteBlog}
-            user={user}
-          />
-        ))}
-      </div>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <BlogsView
+              blogForm={blogForm}
+              blogs={blogs}
+              increaseLikes={increaseLikes}
+              deleteBlog={deleteBlog}
+              user={user}
+            />
+          }
+        />
+        <Route path="/users" element={<UsersView blogs={blogs} />} />
+      </Routes>
     </div>
   );
 };

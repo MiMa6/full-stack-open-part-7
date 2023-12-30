@@ -8,7 +8,6 @@ const UsersView = ({ blogs }) => {
   }
 
   const groupBlogsByAuthor = _.groupBy(blogs, "user.id");
-  const userName = blogs[0].user.name;
 
   return (
     <div>
@@ -20,6 +19,7 @@ const UsersView = ({ blogs }) => {
             <th>Blogs</th>
           </tr>
           {Object.entries(groupBlogsByAuthor).map(([userId, blogs]) => {
+            const userName = blogs[0].user.name;
             return (
               <tr key={userId}>
                 <td>

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import BlogsView from "./components/BlogsView";
+import BlogView from "./components/BlogView";
 import UsersView from "./components/UsersView";
 import UserView from "./components/UserView";
 import BlogForm from "./components/BlogForm";
@@ -25,6 +26,7 @@ import { useSelector, useDispatch } from "react-redux";
 const App = () => {
   const dispatch = useDispatch();
   const userMatch = useMatch("/users/:id");
+  const blogMatch = useMatch("/blogs/:id");
 
   const blogs = useSelector((state) => state.blogs);
   const user = useSelector((state) => state.user);
@@ -129,6 +131,10 @@ const App = () => {
     ? blogsByUserId(userMatch.params.id)
     : null;
 
+  const blogById = (blogId) => blogs.find((blog) => blog.id === blogId);
+
+  const blogByMatch = blogMatch ? blogById(blogMatch.params.id) : null;
+
   return (
     <div>
       <h2>blogs</h2>
@@ -153,6 +159,7 @@ const App = () => {
             />
           }
         />
+        <Route path="/blogs/:id" element={<BlogView blog={blogByMatch} />} />
         <Route path="/users" element={<UsersView blogs={blogs} />} />
         <Route
           path="/users/:id"

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import Navigation from "./components/Navigation";
 import BlogsView from "./components/BlogsView";
 import BlogView from "./components/BlogView";
 import UsersView from "./components/UsersView";
@@ -139,13 +140,9 @@ const App = () => {
     <div>
       <h2>blogs</h2>
       <Notification />
-
-      <div>
-        {user.name} logged in
-        <button onClick={handleLogout}>logout</button>
-      </div>
-
+      <Navigation userName={user.name} handleLogout={handleLogout} />
       <br />
+
       <Routes>
         <Route
           path="/"

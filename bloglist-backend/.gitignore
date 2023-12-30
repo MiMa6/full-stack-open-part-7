@@ -1,0 +1,14 @@
+# dependencies
+node_modules
+
+# Logs
+npm-debug.log*
+
+# VSC
+.vscode
+
+# ENV
+.env
+
+# Local 
+LocalTesting
